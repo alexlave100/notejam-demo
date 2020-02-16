@@ -1,0 +1,138 @@
+{
+"AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Notejam CFN Template",
+
+    "Parameters": {
+        "EBApplicationName" : {
+          "Type" : "String",
+          "Description" : "Name of the Elastic Beanstalk Application."
+        },
+        "EBEnvironmentName" : {
+          "Type" : "String",
+          "Description" : "Name of the Notejam Elastic Beanstalk Environment created from CloudFormation."
+        },
+        "EC2KeyName" : {
+          "Type" : "String",
+          "Description" : "EC2 Key to use for logging into the EC2 instances."
+        },
+        "S3SourceBucket" : {
+          "Type" : "String",
+          "Description" : "S3 bucket containing the source bundle."
+        },
+        "EBSourceBundle" : {
+          "Type" : "String",
+          "Description" : ".zip file to be deployed in the environment. The entire folder path should be configured here, starting from the root of the S3 bucket. Example: zip_files/<name-of-file>.zip"
+        },
+        "DBName" : {
+          "Type" : "String",
+          "Description" : "Name of the database"
+        },
+        "DBUserName" : {
+          "Type" : "String",
+          "Description" : "Name of the user to connect to the database"
+        },
+        "DBPassword" : {
+          "Type" : "String",
+          "Description" : "User password",
+          "NoEcho" : true
+        },
+        "DBEndpoint" : {
+          "Type" : "String",
+          "Description" : "Name of the host endpoint"
+        },
+        "Port" : {
+          "Type" : "String",
+          "Description" : "Port to connect to the database on"
+        }
+    },
+    "Resources": {
+      "EBApplication" : {
+        "Type" : "AWS::ElasticBeanstalk::Application",
+        "Properties" : {
+            "ApplicationName" : { "Ref" : "EBApplicationName" },
+            "Description" : "Elastic Beanstalk Application for Notejam application."
+        }
+      },
+      "EBAppVersion": {
+        "Type" : "AWS::ElasticBeanstalk::ApplicationVersion",
+        "Properties" : {
+          "ApplicationName" : { "Ref" : "EBApplication" },
+          "Description" : "EB Notejam Application specific version",
+          "SourceBundle" : {
+            "S3Bucket" : { "Ref" : "S3SourceBucket" },
+            "S3Key" : { "Ref" : "EBSourceBundle" }
+          }
+        }
+      },
+      "EBConfigTemplate" : {
+        "Type" : "AWS::ElasticBeanstalk::ConfigurationTemplate",
+        "Properties" : {
+          "ApplicationName" : { "Ref" : "EBApplication" },
+          "Description" : "Configuration Template defining configurations of the environment.",
+          "OptionSettings": [
+            {
+              "Namespace": "aws:autoscaling:asg",
+              "OptionName": "MinSize",
+              "Value": "1"
+            },
+            {
+              "Namespace": "aws:autoscaling:asg",
+              "OptionName": "MaxSize",
+              "Value": "4"
+            },
+            {
+              "Namespace": "aws:elasticbeanstalk:environment",
+              "OptionName": "EnvironmentType",
+              "Value": "LoadBalanced"
+            },
+            {
+              "Namespace": "aws:autoscaling:launchconfiguration",
+              "OptionName": "IamInstanceProfile",
+              "Value": "aws-elasticbeanstalk-ec2-role"
+            },
+            {
+              "Namespace" : "aws:autoscaling:launchconfiguration",
+              "OptionName" : "EC2KeyName",
+              "Value" : { "Ref" : "EC2KeyName" }
+            },
+            {
+              "Namespace" : "aws:elasticbeanstalk:application:environment",
+              "OptionName" : "RDS_DB_NAME",
+              "Value" : { "Ref" : "DBName" }
+            },
+            {
+              "Namespace" : "aws:elasticbeanstalk:application:environment",
+              "OptionName" : "RDS_USERNAME",
+              "Value" : { "Ref" : "DBUserName" }
+            },
+            {
+              "Namespace" : "aws:elasticbeanstalk:application:environment",
+              "OptionName" : "RDS_PASSWORD",
+              "Value" : { "Ref" : "DBPassword" }
+            },
+            {
+              "Namespace" : "aws:elasticbeanstalk:application:environment",
+              "OptionName" : "RDS_HOSTNAME",
+              "Value" : { "Ref" : "DBEndpoint" }
+            },
+            {
+              "Namespace" : "aws:elasticbeanstalk:application:environment",
+              "OptionName" : "RDS_PORT",
+              "Value" : { "Ref" : "Port" }
+            }
+          ],
+          "SolutionStackName" : "64bit Amazon Linux 2018.03 v2.9.5 running Python 2.7"
+        }
+      },
+      "EBEnvironment" : {
+        "Type" : "AWS::ElasticBeanstalk::Environment",
+        "Properties" : {
+            "ApplicationName" : { "Ref" : "EBApplication" },
+            "EnvironmentName" : { "Ref" : "EBEnvironmentName" },
+            "Description" : "Notejam Elastic Beanstalk Environment",
+            "TemplateName" : { "Ref" : "EBConfigTemplate" },
+            "VersionLabel": { "Ref": "EBAppVersion" }
+        }
+      }
+    }
+}

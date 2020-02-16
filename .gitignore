@@ -1,0 +1,13 @@
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+
+# cfn-tmp file
+cfn-tmp.json
+datadump*
+
+*.zip
+
+*DS_STORE*
