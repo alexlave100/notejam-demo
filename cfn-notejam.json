@@ -12,7 +12,7 @@
           "Description" : "Name of the Notejam Elastic Beanstalk Environment created from CloudFormation."
         },
         "EC2KeyName" : {
-          "Type" : "String",
+          "Type" : "AWS::EC2::KeyPair::KeyName",
           "Description" : "EC2 Key to use for logging into the EC2 instances."
         },
         "S3SourceBucket" : {
