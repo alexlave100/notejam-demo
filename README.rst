@@ -77,18 +77,3 @@ Run functional and unit tests:
 
     $ cd YOUR_PROJECT_DIR/django/notejam/
     $ ./manage.py test
-
-
-============
-Contribution
-============
-Do you have python/django experience? Help the app to follow python and django best practices.
-
-Please send your pull requests in the ``master`` branch.
-Always prepend your commits with framework name:
-
-.. code-block:: bash
-
-    Django: Implemented sign in functionality
-
-Read `contribution guide <https://github.com/komarserjio/notejam/blob/master/contribute.rst>`_ for details.
