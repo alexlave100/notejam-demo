@@ -2,6 +2,7 @@
 Notejam Migration to Amazon Web Services
 ****************************************
 
+
 The current version of Notejam is deployed as a monolith application, serving all technical content from the same source. The source code is written in Python v2.7 and backed by the Django web framework and the database used is a SQLite3 database embedded into the end program.
 The first step towards migrating the application to AWS is to break up the monolithic architecture and define the different components inside separate technical boundaries using AWS specific technologies.
 
